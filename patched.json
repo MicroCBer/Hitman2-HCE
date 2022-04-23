@@ -1,0 +1,13 @@
+[
+    "Contract.Data.Bricks",
+    "Contract.Metadata.ScenePath",
+    "Contract.Metadata.Location",
+    "Contract.Metadata.PublicId",
+    "ContractSessionId",
+    "Contract.Metadata.Id",
+    "Contract.Metadata.CodeName_Hint",
+    "Contract.Metadata.Description",
+    "Contract.Metadata.CreatorUserId",
+    "Contract.Metadata.CreationTimestamp",
+    "Contract.Metadata.PublicId"
+]

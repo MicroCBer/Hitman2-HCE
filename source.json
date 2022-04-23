@@ -1,0 +1,923 @@
+{
+    "Contract": {
+        "Data": {
+            "Objectives": [{
+                    "Id": "ae1ea0ce-d3a4-410f-841e-86019e7f7d1f",
+                    "Type": "statemachine",
+                    "Category": "primary",
+                    "ObjectiveType": "custom",
+                    "Image": "images/contracts/CreateContract/tile.jpg",
+                    "BriefingName": "$loc UI_CONTRACT_CREATE_CONTRACT_TUTORIAL_OBJ_1",
+                    "BriefingText": {
+                        "$loc": {
+                            "key": "UI_CONTRACT_CREATE_CONTRACT_OBJ_1",
+                            "data": [5]
+                        }
+                    },
+                    "HUDTemplate": {
+                        "display": {
+                            "$loc": {
+                                "key": "UI_CONTRACT_CREATE_CONTRACT_OBJ_1",
+                                "data": ["$.MaxTags"]
+                            }
+                        }
+                    },
+                    "Definition": {
+                        "Scope": "hit",
+                        "Context": {
+                            "MaxTags": 5,
+                            "Tags": 0
+                        },
+                        "States": {
+                            "Start": {
+                                "ActorTagged": [{
+                                        "Condition": {
+                                            "$eq": ["$Value.Tagged", true]
+                                        },
+                                        "Actions": {
+                                            "$inc": "Tags"
+                                        },
+                                        "Transition": "Success"
+                                    }
+                                ]
+                            },
+                            "Success": {
+                                "ActorTagged": [{
+                                        "Condition": {
+                                            "$eq": ["$Value.Tagged", true]
+                                        },
+                                        "Actions": {
+                                            "$inc": "Tags"
+                                        }
+                                    }, {
+                                        "Condition": {
+                                            "$eq": ["$Value.Tagged", false]
+                                        },
+                                        "Actions": {
+                                            "$dec": "Tags"
+                                        }
+                                    }, {
+                                        "Condition": {
+                                            "$eq": ["$.Tags", 0]
+                                        },
+                                        "Transition": "Start"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }, {
+                    "Id": "19bb5722-6a50-4bac-a6b9-339aa035d95d",
+                    "Category": "secondary",
+                    "OnActive": {},
+                    "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_DO_NOT_GET_SPOTTED_SECONDARY_OBJ",
+                    "HUDTemplate": {
+                        "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_DO_NOT_GET_SPOTTED_SECONDARY_OBJ"
+                    },
+                    "Type": "statemachine",
+                    "CombinedDisplayInHud": true,
+                    "Definition": {
+                        "Scope": "session",
+                        "Context": {
+                            "PacifiedIds": []
+                        },
+                        "States": {
+                            "Start": {
+                                "-": {
+                                    "Transition": "Success"
+                                }
+                            },
+                            "Success": {
+                                "Spotted": {
+                                    "Transition": "Failure"
+                                },
+                                "Pacify": {
+                                    "Actions": {
+                                        "$reset": "PacifiedIds",
+                                        "$pushunique": ["PacifiedIds", "$Value.RepositoryId"]
+                                    }
+                                },
+                                "Witnesses": [{
+                                        "Condition": {
+                                            "$all": {
+                                                "in": "$.PacifiedIds",
+                                                "?": {
+                                                    "$any": {
+                                                        "in": "$Value",
+                                                        "?": {
+                                                            "$eq": ["$.#", "$.##"]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "Transition": "Failure"
+                                    }, {
+                                        "Actions": {
+                                            "$reset": "PacifiedIds"
+                                        }
+                                    }
+                                ],
+                                "DisguiseBlown": {
+                                    "Transition": "Failure"
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    "Id": "0f0ba5aa-1e7d-40fe-82f5-d4b8ad1f007a",
+                    "Category": "secondary",
+                    "OnActive": {},
+                    "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_RECORDINGS_SECONDARY_OBJ",
+                    "HUDTemplate": {
+                        "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_RECORDINGS_SECONDARY_OBJ"
+                    },
+                    "Type": "statemachine",
+                    "CombinedDisplayInHud": true,
+                    "Definition": {
+                        "Scope": "session",
+                        "Context": {},
+                        "States": {
+                            "Start": {
+                                "-": {
+                                    "Transition": "Success"
+                                }
+                            },
+                            "Success": {
+                                "SecuritySystemRecorder": {
+                                    "Condition": {
+                                        "$eq": ["$Value.event", "spotted"]
+                                    },
+                                    "Transition": "Recorded"
+                                }
+                            },
+                            "Recorded": {
+                                "SecuritySystemRecorder": {
+                                    "Condition": {
+                                        "$or": [{
+                                                "$eq": ["$Value.event", "erased"]
+                                            }, {
+                                                "$eq": ["$Value.event", "destroyed"]
+                                            }
+                                        ]
+                                    },
+                                    "Transition": "Success"
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    "Id": "4c07865c-d4fe-4d62-a29f-88f65ec1b716",
+                    "Category": "secondary",
+                    "OnActive": {},
+                    "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_BODIES_FOUND_SECONDARY_OBJ",
+                    "HUDTemplate": {
+                        "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_BODIES_FOUND_SECONDARY_OBJ"
+                    },
+                    "Type": "statemachine",
+                    "CombinedDisplayInHud": true,
+                    "Definition": {
+                        "Scope": "session",
+                        "States": {
+                            "Start": {
+                                "-": {
+                                    "Transition": "Success"
+                                }
+                            },
+                            "Success": {
+                                "DeadBodySeen": {
+                                    "Transition": "Failure"
+                                },
+                                "BodyFound": {
+                                    "Transition": "Failure"
+                                },
+                                "CrowdNPC_Died": {
+                                    "Transition": "Failure"
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    "Id": "103e3e7c-20f3-4274-b21d-cdb8f97ddb3d",
+                    "Category": "secondary",
+                    "OnActive": {},
+                    "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HIDE_ALL_BODIES_SECONDARY_OBJ",
+                    "HUDTemplate": {
+                        "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HIDE_ALL_BODIES_SECONDARY_OBJ"
+                    },
+                    "Type": "statemachine",
+                    "CombinedDisplayInHud": true,
+                    "Definition": {
+                        "Scope": "session",
+                        "Context": {
+                            "IsExiting": 0,
+                            "PacifiedBodiesHidden": true,
+                            "DeadBodiesHidden": true
+                        },
+                        "States": {
+                            "Start": {
+                                "-": {
+                                    "Transition": "Success"
+                                }
+                            },
+                            "Success": {
+                                "Kill": {
+                                    "Condition": {
+                                        "$eq": ["$.IsExiting", 0]
+                                    },
+                                    "Actions": {
+                                        "$set": ["DeadBodiesHidden", false]
+                                    },
+                                    "Transition": "NeedToHideBodies"
+                                },
+                                "Pacify": {
+                                    "Condition": {
+                                        "$eq": ["$.IsExiting", 0]
+                                    },
+                                    "Actions": {
+                                        "$set": ["PacifiedBodiesHidden", false]
+                                    },
+                                    "Transition": "NeedToHideBodies"
+                                },
+                                "exit_gate": {
+                                    "Actions": {
+                                        "$inc": "IsExiting"
+                                    }
+                                },
+                                "BodyBagged": {
+                                    "Condition": {
+                                        "$eq": ["$.IsExiting", 0]
+                                    },
+                                    "Transition": "Failure"
+                                }
+                            },
+                            "NeedToHideBodies": {
+                                "BodyBagged": {
+                                    "Transition": "Failure"
+                                },
+                                "Kill": {
+                                    "Actions": {
+                                        "$set": ["DeadBodiesHidden", false]
+                                    }
+                                },
+                                "Pacify": {
+                                    "Actions": {
+                                        "$set": ["PacifiedBodiesHidden", false]
+                                    }
+                                },
+                                "AllBodiesHidden": [{
+                                        "Actions": {
+                                            "$set": ["DeadBodiesHidden", true]
+                                        }
+                                    }, {
+                                        "Condition": {
+                                            "$and": [{
+                                                    "$eq": ["$.PacifiedBodiesHidden", true]
+                                                }, {
+                                                    "$eq": ["$.DeadBodiesHidden", true]
+                                                }
+                                            ]
+                                        },
+                                        "Transition": "Success"
+                                    }
+                                ],
+                                "AllPacifiedHidden": [{
+                                        "Actions": {
+                                            "$set": ["PacifiedBodiesHidden", true]
+                                        }
+                                    }, {
+                                        "Condition": {
+                                            "$and": [{
+                                                    "$eq": ["$.PacifiedBodiesHidden", true]
+                                                }, {
+                                                    "$eq": ["$.DeadBodiesHidden", true]
+                                                }
+                                            ]
+                                        },
+                                        "Transition": "Success"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }, {
+                    "Id": "c7e137c6-f66e-4851-87ae-0d9e6c9a9756",
+                    "Category": "secondary",
+                    "OnActive": {},
+                    "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_DISGUISE_CHANGES_SECONDARY_OBJ",
+                    "HUDTemplate": {
+                        "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_DISGUISE_CHANGES_SECONDARY_OBJ"
+                    },
+                    "Type": "statemachine",
+                    "CombinedDisplayInHud": true,
+                    "Definition": {
+                        "Scope": "session",
+                        "States": {
+                            "Start": {
+                                "-": {
+                                    "Transition": "Success"
+                                }
+                            },
+                            "Success": {
+                                "Disguise": {
+                                    "Transition": "Failure"
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    "Id": "343c4786-3c5d-429f-a4d7-9d0aa7ea7b2f",
+                    "Category": "secondary",
+                    "OnActive": {},
+                    "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HEADSHOTS_ONLY_SECONDARY_OBJ",
+                    "HUDTemplate": {
+                        "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HEADSHOTS_ONLY_SECONDARY_OBJ"
+                    },
+                    "Type": "statemachine",
+                    "CombinedDisplayInHud": true,
+                    "Definition": {
+                        "Scope": "session",
+                        "States": {
+                            "Start": {
+                                "-": {
+                                    "Transition": "Success"
+                                }
+                            },
+                            "Success": {
+                                "FirstNonHeadshot": {
+                                    "Transition": "Failure"
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    "Id": "64f09887-e4e8-4c14-8d25-02fe87ddf5bf",
+                    "Category": "secondary",
+                    "OnActive": {},
+                    "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_MISSED_SHOTS_SECONDARY_OBJ",
+                    "HUDTemplate": {
+                        "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_MISSED_SHOTS_SECONDARY_OBJ"
+                    },
+                    "Type": "statemachine",
+                    "CombinedDisplayInHud": true,
+                    "Definition": {
+                        "Scope": "session",
+                        "States": {
+                            "Start": {
+                                "-": {
+                                    "Transition": "Success"
+                                }
+                            },
+                            "Success": {
+                                "FirstMissedShot": {
+                                    "Transition": "Failure"
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    "Id": "6d660621-ebbb-4be5-947a-0378ab8a1da5",
+                    "Category": "secondary",
+                    "OnActive": {},
+                    "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_PACIFICATIONS_SECONDARY_OBJ",
+                    "HUDTemplate": {
+                        "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_PACIFICATIONS_SECONDARY_OBJ"
+                    },
+                    "Type": "statemachine",
+                    "CombinedDisplayInHud": true,
+                    "Definition": {
+                        "Scope": "session",
+                        "States": {
+                            "Start": {
+                                "-": {
+                                    "Transition": "Success"
+                                }
+                            },
+                            "Success": {
+                                "Pacify": {
+                                    "Transition": "Failure"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "Bricks": ["assembly:/_pro/scenes/missions/marrakesh/mission_marrakesh_screwdriver.brick"],
+            "GameChangers": ["61a618c2-1cfc-46fa-846b-467de76042d6", "b48bb7f9-b630-48cb-a816-720ed7959319", "1f8f0b8b-1f65-4d6c-a2f4-fc8adffa394a", "9673f602-3b2a-4bd3-94b3-b3b311b7bc7e", "a77cf01e-ab02-4b1c-a4bd-a37fb8be1114", "008d2eb9-c1c8-44e0-a636-ccca63629f3c", "1efef5c0-7381-4e22-ac04-ffbd0822cc96", "f96e94b7-1c0e-49c9-9332-07346a955fd2", "95690829-7da4-4225-a087-08918cccf120"],
+            "GameChangerReferences": [{
+                    "Id": "61a618c2-1cfc-46fa-846b-467de76042d6",
+                    "Name": "",
+                    "Description": "",
+                    "Icon": "",
+                    "IsHidden": true,
+                    "TileImage": null,
+                    "Resource": [],
+                    "Objectives": [{
+                            "Id": "ae1ea0ce-d3a4-410f-841e-86019e7f7d1f",
+                            "Type": "statemachine",
+                            "Category": "primary",
+                            "ObjectiveType": "custom",
+                            "Image": "images/contracts/CreateContract/tile.jpg",
+                            "BriefingName": "$loc UI_CONTRACT_CREATE_CONTRACT_TUTORIAL_OBJ_1",
+                            "BriefingText": {
+                                "$loc": {
+                                    "key": "UI_CONTRACT_CREATE_CONTRACT_OBJ_1",
+                                    "data": [5]
+                                }
+                            },
+                            "HUDTemplate": {
+                                "display": {
+                                    "$loc": {
+                                        "key": "UI_CONTRACT_CREATE_CONTRACT_OBJ_1",
+                                        "data": ["$.MaxTags"]
+                                    }
+                                }
+                            },
+                            "Definition": {
+                                "Scope": "hit",
+                                "Context": {
+                                    "MaxTags": 5,
+                                    "Tags": 0
+                                },
+                                "States": {
+                                    "Start": {
+                                        "ActorTagged": [{
+                                                "Condition": {
+                                                    "$eq": ["$Value.Tagged", true]
+                                                },
+                                                "Actions": {
+                                                    "$inc": "Tags"
+                                                },
+                                                "Transition": "Success"
+                                            }
+                                        ]
+                                    },
+                                    "Success": {
+                                        "ActorTagged": [{
+                                                "Condition": {
+                                                    "$eq": ["$Value.Tagged", true]
+                                                },
+                                                "Actions": {
+                                                    "$inc": "Tags"
+                                                }
+                                            }, {
+                                                "Condition": {
+                                                    "$eq": ["$Value.Tagged", false]
+                                                },
+                                                "Actions": {
+                                                    "$dec": "Tags"
+                                                }
+                                            }, {
+                                                "Condition": {
+                                                    "$eq": ["$.Tags", 0]
+                                                },
+                                                "Transition": "Start"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    "Id": "b48bb7f9-b630-48cb-a816-720ed7959319",
+                    "Name": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_DO_NOT_GET_SPOTTED_SECONDARY_NAME",
+                    "Description": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_DO_NOT_GET_SPOTTED_SECONDARY_DESC",
+                    "Icon": "images/challenges/default_challenge_icon.png",
+                    "IsHidden": null,
+                    "TileImage": "images/contractconditions/condition_contrac_do_not_be_spotted.jpg",
+                    "Resource": [],
+                    "Objectives": [{
+                            "Id": "19bb5722-6a50-4bac-a6b9-339aa035d95d",
+                            "Category": "secondary",
+                            "OnActive": {},
+                            "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_DO_NOT_GET_SPOTTED_SECONDARY_OBJ",
+                            "HUDTemplate": {
+                                "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_DO_NOT_GET_SPOTTED_SECONDARY_OBJ"
+                            },
+                            "Type": "statemachine",
+                            "CombinedDisplayInHud": true,
+                            "Definition": {
+                                "Scope": "session",
+                                "Context": {
+                                    "PacifiedIds": []
+                                },
+                                "States": {
+                                    "Start": {
+                                        "-": {
+                                            "Transition": "Success"
+                                        }
+                                    },
+                                    "Success": {
+                                        "Spotted": {
+                                            "Transition": "Failure"
+                                        },
+                                        "Pacify": {
+                                            "Actions": {
+                                                "$reset": "PacifiedIds",
+                                                "$pushunique": ["PacifiedIds", "$Value.RepositoryId"]
+                                            }
+                                        },
+                                        "Witnesses": [{
+                                                "Condition": {
+                                                    "$all": {
+                                                        "in": "$.PacifiedIds",
+                                                        "?": {
+                                                            "$any": {
+                                                                "in": "$Value",
+                                                                "?": {
+                                                                    "$eq": ["$.#", "$.##"]
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "Transition": "Failure"
+                                            }, {
+                                                "Actions": {
+                                                    "$reset": "PacifiedIds"
+                                                }
+                                            }
+                                        ],
+                                        "DisguiseBlown": {
+                                            "Transition": "Failure"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    "Id": "1f8f0b8b-1f65-4d6c-a2f4-fc8adffa394a",
+                    "Name": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_RECORDINGS_SECONDARY_NAME",
+                    "Description": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_RECORDINGS_SECONDARY_DESC",
+                    "Icon": "images/challenges/default_challenge_icon.png",
+                    "IsHidden": null,
+                    "TileImage": "images/contracts/gamechangers/gamechanger_global_bigbrother.jpg",
+                    "Resource": [],
+                    "Objectives": [{
+                            "Id": "0f0ba5aa-1e7d-40fe-82f5-d4b8ad1f007a",
+                            "Category": "secondary",
+                            "OnActive": {},
+                            "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_RECORDINGS_SECONDARY_OBJ",
+                            "HUDTemplate": {
+                                "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_RECORDINGS_SECONDARY_OBJ"
+                            },
+                            "Type": "statemachine",
+                            "CombinedDisplayInHud": true,
+                            "Definition": {
+                                "Scope": "session",
+                                "Context": {},
+                                "States": {
+                                    "Start": {
+                                        "-": {
+                                            "Transition": "Success"
+                                        }
+                                    },
+                                    "Success": {
+                                        "SecuritySystemRecorder": {
+                                            "Condition": {
+                                                "$eq": ["$Value.event", "spotted"]
+                                            },
+                                            "Transition": "Recorded"
+                                        }
+                                    },
+                                    "Recorded": {
+                                        "SecuritySystemRecorder": {
+                                            "Condition": {
+                                                "$or": [{
+                                                        "$eq": ["$Value.event", "erased"]
+                                                    }, {
+                                                        "$eq": ["$Value.event", "destroyed"]
+                                                    }
+                                                ]
+                                            },
+                                            "Transition": "Success"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    "Id": "9673f602-3b2a-4bd3-94b3-b3b311b7bc7e",
+                    "Name": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_BODIES_FOUND_SECONDARY_NAME",
+                    "Description": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_BODIES_FOUND_SECONDARY_DESC",
+                    "Icon": "images/challenges/default_challenge_icon.png",
+                    "IsHidden": null,
+                    "TileImage": "images/contractconditions/condition_contrac_no_bodies_found.jpg",
+                    "Resource": [],
+                    "Objectives": [{
+                            "Id": "4c07865c-d4fe-4d62-a29f-88f65ec1b716",
+                            "Category": "secondary",
+                            "OnActive": {},
+                            "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_BODIES_FOUND_SECONDARY_OBJ",
+                            "HUDTemplate": {
+                                "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_BODIES_FOUND_SECONDARY_OBJ"
+                            },
+                            "Type": "statemachine",
+                            "CombinedDisplayInHud": true,
+                            "Definition": {
+                                "Scope": "session",
+                                "States": {
+                                    "Start": {
+                                        "-": {
+                                            "Transition": "Success"
+                                        }
+                                    },
+                                    "Success": {
+                                        "DeadBodySeen": {
+                                            "Transition": "Failure"
+                                        },
+                                        "BodyFound": {
+                                            "Transition": "Failure"
+                                        },
+                                        "CrowdNPC_Died": {
+                                            "Transition": "Failure"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    "Id": "a77cf01e-ab02-4b1c-a4bd-a37fb8be1114",
+                    "Name": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HIDE_ALL_BODIES_SECONDARY_NAME",
+                    "Description": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HIDE_ALL_BODIES_SECONDARY_DESC",
+                    "Icon": "images/challenges/default_challenge_icon.png",
+                    "IsHidden": null,
+                    "TileImage": "images/contractconditions/condition_contrac_hide_all_bodies.jpg",
+                    "Resource": [],
+                    "Objectives": [{
+                            "Id": "103e3e7c-20f3-4274-b21d-cdb8f97ddb3d",
+                            "Category": "secondary",
+                            "OnActive": {},
+                            "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HIDE_ALL_BODIES_SECONDARY_OBJ",
+                            "HUDTemplate": {
+                                "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HIDE_ALL_BODIES_SECONDARY_OBJ"
+                            },
+                            "Type": "statemachine",
+                            "CombinedDisplayInHud": true,
+                            "Definition": {
+                                "Scope": "session",
+                                "Context": {
+                                    "IsExiting": 0,
+                                    "PacifiedBodiesHidden": true,
+                                    "DeadBodiesHidden": true
+                                },
+                                "States": {
+                                    "Start": {
+                                        "-": {
+                                            "Transition": "Success"
+                                        }
+                                    },
+                                    "Success": {
+                                        "Kill": {
+                                            "Condition": {
+                                                "$eq": ["$.IsExiting", 0]
+                                            },
+                                            "Actions": {
+                                                "$set": ["DeadBodiesHidden", false]
+                                            },
+                                            "Transition": "NeedToHideBodies"
+                                        },
+                                        "Pacify": {
+                                            "Condition": {
+                                                "$eq": ["$.IsExiting", 0]
+                                            },
+                                            "Actions": {
+                                                "$set": ["PacifiedBodiesHidden", false]
+                                            },
+                                            "Transition": "NeedToHideBodies"
+                                        },
+                                        "exit_gate": {
+                                            "Actions": {
+                                                "$inc": "IsExiting"
+                                            }
+                                        },
+                                        "BodyBagged": {
+                                            "Condition": {
+                                                "$eq": ["$.IsExiting", 0]
+                                            },
+                                            "Transition": "Failure"
+                                        }
+                                    },
+                                    "NeedToHideBodies": {
+                                        "BodyBagged": {
+                                            "Transition": "Failure"
+                                        },
+                                        "Kill": {
+                                            "Actions": {
+                                                "$set": ["DeadBodiesHidden", false]
+                                            }
+                                        },
+                                        "Pacify": {
+                                            "Actions": {
+                                                "$set": ["PacifiedBodiesHidden", false]
+                                            }
+                                        },
+                                        "AllBodiesHidden": [{
+                                                "Actions": {
+                                                    "$set": ["DeadBodiesHidden", true]
+                                                }
+                                            }, {
+                                                "Condition": {
+                                                    "$and": [{
+                                                            "$eq": ["$.PacifiedBodiesHidden", true]
+                                                        }, {
+                                                            "$eq": ["$.DeadBodiesHidden", true]
+                                                        }
+                                                    ]
+                                                },
+                                                "Transition": "Success"
+                                            }
+                                        ],
+                                        "AllPacifiedHidden": [{
+                                                "Actions": {
+                                                    "$set": ["PacifiedBodiesHidden", true]
+                                                }
+                                            }, {
+                                                "Condition": {
+                                                    "$and": [{
+                                                            "$eq": ["$.PacifiedBodiesHidden", true]
+                                                        }, {
+                                                            "$eq": ["$.DeadBodiesHidden", true]
+                                                        }
+                                                    ]
+                                                },
+                                                "Transition": "Success"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    "Id": "008d2eb9-c1c8-44e0-a636-ccca63629f3c",
+                    "Name": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_DISGUISE_CHANGES_SECONDARY_NAME",
+                    "Description": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_DISGUISE_CHANGES_SECONDARY_DESC",
+                    "Icon": "images/challenges/default_challenge_icon.png",
+                    "IsHidden": null,
+                    "TileImage": "images/contractconditions/condition_contract_no_disguise_changes.jpg",
+                    "Resource": [],
+                    "Objectives": [{
+                            "Id": "c7e137c6-f66e-4851-87ae-0d9e6c9a9756",
+                            "Category": "secondary",
+                            "OnActive": {},
+                            "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_DISGUISE_CHANGES_SECONDARY_OBJ",
+                            "HUDTemplate": {
+                                "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_DISGUISE_CHANGES_SECONDARY_OBJ"
+                            },
+                            "Type": "statemachine",
+                            "CombinedDisplayInHud": true,
+                            "Definition": {
+                                "Scope": "session",
+                                "States": {
+                                    "Start": {
+                                        "-": {
+                                            "Transition": "Success"
+                                        }
+                                    },
+                                    "Success": {
+                                        "Disguise": {
+                                            "Transition": "Failure"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    "Id": "1efef5c0-7381-4e22-ac04-ffbd0822cc96",
+                    "Name": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HEADSHOTS_ONLY_SECONDARY_NAME",
+                    "Description": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HEADSHOTS_ONLY_SECONDARY_DESC",
+                    "Icon": "images/challenges/default_challenge_icon.png",
+                    "IsHidden": null,
+                    "TileImage": "images/contractconditions/condition_contrac_headshots_only.jpg",
+                    "Resource": [],
+                    "Objectives": [{
+                            "Id": "343c4786-3c5d-429f-a4d7-9d0aa7ea7b2f",
+                            "Category": "secondary",
+                            "OnActive": {},
+                            "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HEADSHOTS_ONLY_SECONDARY_OBJ",
+                            "HUDTemplate": {
+                                "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_HEADSHOTS_ONLY_SECONDARY_OBJ"
+                            },
+                            "Type": "statemachine",
+                            "CombinedDisplayInHud": true,
+                            "Definition": {
+                                "Scope": "session",
+                                "States": {
+                                    "Start": {
+                                        "-": {
+                                            "Transition": "Success"
+                                        }
+                                    },
+                                    "Success": {
+                                        "FirstNonHeadshot": {
+                                            "Transition": "Failure"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    "Id": "f96e94b7-1c0e-49c9-9332-07346a955fd2",
+                    "Name": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_MISSED_SHOTS_SECONDARY_NAME",
+                    "Description": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_MISSED_SHOTS_SECONDARY_DESC",
+                    "Icon": "images/challenges/default_challenge_icon.png",
+                    "IsHidden": null,
+                    "TileImage": "images/contractconditions/condition_contrac_no_missed_shots.jpg",
+                    "Resource": [],
+                    "Objectives": [{
+                            "Id": "64f09887-e4e8-4c14-8d25-02fe87ddf5bf",
+                            "Category": "secondary",
+                            "OnActive": {},
+                            "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_MISSED_SHOTS_SECONDARY_OBJ",
+                            "HUDTemplate": {
+                                "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_MISSED_SHOTS_SECONDARY_OBJ"
+                            },
+                            "Type": "statemachine",
+                            "CombinedDisplayInHud": true,
+                            "Definition": {
+                                "Scope": "session",
+                                "States": {
+                                    "Start": {
+                                        "-": {
+                                            "Transition": "Success"
+                                        }
+                                    },
+                                    "Success": {
+                                        "FirstMissedShot": {
+                                            "Transition": "Failure"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    "Id": "95690829-7da4-4225-a087-08918cccf120",
+                    "Name": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_PACIFICATIONS_SECONDARY_NAME",
+                    "Description": "UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_PACIFICATIONS_SECONDARY_DESC",
+                    "Icon": "images/challenges/default_challenge_icon.png",
+                    "IsHidden": null,
+                    "TileImage": "images/contracts/gamechangers/Gamechanger_Global_NoPacifications.jpg",
+                    "Resource": [],
+                    "Objectives": [{
+                            "Id": "6d660621-ebbb-4be5-947a-0378ab8a1da5",
+                            "Category": "secondary",
+                            "OnActive": {},
+                            "BriefingText": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_PACIFICATIONS_SECONDARY_OBJ",
+                            "HUDTemplate": {
+                                "display": "$loc UI_GAMECHANGERS_GLOBAL_CONTRACTCONDITION_NO_PACIFICATIONS_SECONDARY_OBJ"
+                            },
+                            "Type": "statemachine",
+                            "CombinedDisplayInHud": true,
+                            "Definition": {
+                                "Scope": "session",
+                                "States": {
+                                    "Start": {
+                                        "-": {
+                                            "Transition": "Success"
+                                        }
+                                    },
+                                    "Success": {
+                                        "Pacify": {
+                                            "Transition": "Failure"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "EnableSaving": false
+        },
+        "Metadata": {
+            "IsLocked": false,
+            "CreatorUserId": "fadb923c-e6bb-4283-a537-eb4d1150262e",
+            "IsPublished": true,
+            "TileImage": "images/contracts/hippo/tile.jpg",
+            "Location": "LOCATION_MARRAKECH",
+            "Title": "UI_CONTRACT_CREATE_CONTRACT_TITLE",
+            "ScenePath": "assembly:/_pro/scenes/missions/marrakesh/_scene_spider.entity",
+            "Description": "UI_CONTRACT_CREATE_CONTRACT_DESC",
+            "Id": "3f95f6fd-a0f7-4d07-9df4-9736167a6c5e",
+            "CreationTimestamp": "2018-04-30T12:55:18Z",
+            "CodeName_Hint": "Create contract New Zealand Sheep",
+            "Type": "creation",
+            "Release": "1.0.x",
+            "Entitlements": ["H2_LEGACY_STANDARD"],
+            "LastUpdate": "2021-10-07T08:42:49.1340494Z",
+            "PublicId": "020386538747",
+            "IsFeatured": true,
+            "OpportunityData": []
+        },
+        "UserData": {}
+    },
+    "ContractSessionId": "2517643691755820498-13c04036-3622-4676-b113-52354227b54a"
+}
